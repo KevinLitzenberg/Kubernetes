@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mysql.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "mysql.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "mysql.name" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: "MYSQL_ROOT_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_root_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_USER"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_user
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_DATABASE"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_database
+                name: {{ .Release.Name }}-auth
+ 
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          name: mysql
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: {{ .Values.persistentVolumeInitdbName }}
+        - mountPath: {{ .Values.persistentVolumeMountPath }}
+          name: {{ .Values.persistentVolumeClaim }}  
+      volumes:
+      - name: mysql-data-disk
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumeClaim }}
+      - name: {{ .Values.persistentVolumeInitdbName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumeInitdbClaim }}
