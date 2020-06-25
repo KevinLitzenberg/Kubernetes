@@ -38,7 +38,7 @@ spec:
                 name: {{ .Release.Name }}-auth
  
         ports:
-        - containerPort: {{ .Values.service.port }}
+        - containerPort: {{ .Values.mysqlService.port }}
           name: mysql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d

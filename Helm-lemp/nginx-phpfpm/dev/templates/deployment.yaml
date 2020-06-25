@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-phpfpm
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}-phpfpm
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}-phpfpm
+    spec:
+      containers:
+      - name: {{ template "fullname" . }}-phpfpm
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.phpfpmService.phpfpmPort }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.phpfpmService.phpfpmPort }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: phpconf-overrides
+          mountPath: /opt/bitnami/php/etc/conf.d/php-ini-overrides.ini
+          subPath: php-ini-overrides.ini
+        - name: {{ .Values.volumes.php.persistentPublicVolumeNamePhp }}
+          mountPath: {{ .Values.volumes.php.persistentPublicVolumeMountPathPhp }}
+      volumes:
+      - name: phpconf-overrides
+        configMap:
+          name: {{ template "fullname" . }}-phpconf-overrides
+          items:
+          - key: php-ini-overrides.ini
+            path: php-ini-overrides.ini
+      - name: {{ .Values.volumes.php.persistentPublicVolumeNamePhp }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.php.persistentPublicVolumeClaimPhp }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-nginx
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}-nginx
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}-nginx
+    spec:
+      containers:
+      - name: {{ template "fullname" . }}-nginx
+        image: "nginx:1.17.8-alpine"
+        imagePullPolicy: {{ default "" .Values.image.pullPolicy | quote }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.nginxService.internalPort }}
+        - name: https
+          containerPort: 8443
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        volumeMounts:
+        - name: {{ template "fullname" . }}-conf
+          mountPath: /etc/nginx/conf.d/custom-config.conf
+          subPath: custom-config.conf
+        - name: {{ .Values.persistentPublicVolumeName }}
+          mountPath: {{ .Values.persistentPublicVolumeMountPathNginx }}
+      volumes:
+      - name: {{ template "fullname" . }}-conf
+        configMap: 
+          name: {{ template "fullname" . }}-conf
+          items:
+          - key: custom-config.conf
+            path: custom-config.conf
+      - name: {{ .Values.persistentPublicVolumeName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentPublicVolumeClaim }}            

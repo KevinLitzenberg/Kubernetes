@@ -17,7 +17,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-service:
+mysqlService:
+  name: mysql
   type: NodePort
   port: 3600
 
