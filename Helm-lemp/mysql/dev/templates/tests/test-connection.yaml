@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "mysql.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "mysql.fullname" . }}:{{ .Values.mysqlService.port }}']
   restartPolicy: Never

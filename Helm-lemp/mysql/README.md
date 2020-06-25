@@ -5,6 +5,7 @@ Developed for use with LEMP stack.
 Dependencies:
 * [zendesk/helm-secrets](https://github.com/zendesk/helm-secrets)
 * [mozilla/sopes](https://github.com/mozilla/sops)
+* [namespace plugin](https://github.com/thomastaylor312/helm-namespace)
 
 ## mysql initialize the database upon creation.
 ./mysql/[environment]/initdb/file.mysql (currently wallfaces3.sql)

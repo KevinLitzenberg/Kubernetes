@@ -4,7 +4,7 @@ metadata:
   name: {{ include "mysql.fullname" . }}
 spec:
   ports:
-  - port: {{ .Values.service.port }}
+  - port: {{ .Values.mysqlService.port }}
   selector:
     app: {{ include "mysql.name" . }}
   clusterIP: None
