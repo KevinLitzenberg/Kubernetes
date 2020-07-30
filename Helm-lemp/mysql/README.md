@@ -32,6 +32,8 @@ Includes two persistenVolumes.
 
 [TO DO PROD]
 * Create persistent elastic volumes in AWS
-* Create a path to database.sql so db can initalize upon creation.
-* Create encyption keys for secrets.
+* ~~Create a path to database.sql so db can initalize upon creation.~~
+* ~~Create encyption keys for secrets.~~
 * Lockdown mysql version dev uses latest.
+* ~~Stop logging the following message.~~ "Please use caching_sha2_password instead'
+2020-07-01T18:00:09.691399Z 908 [Warning] [MY-013360] [Server] Plugin sha256_password reported: ''sha256_pas"

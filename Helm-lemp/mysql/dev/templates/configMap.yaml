@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mysql.name" . }}-mysql-overrides
+  labels:
+    app: {{ include "mysql.name" . }}-mysql-overrides
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  mysql.cnf: |-
+{{ .Files.Get "files/mysql.cnf" | indent 4 }}

@@ -20,8 +20,30 @@ spec:
       - name: {{ template "fullname" . }}-phpfpm
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: "MYSQL_ROOT_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_root_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_USER"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_user
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_DATABASE"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_database
+                name: {{ .Release.Name }}-auth
         ports:
-        - containerPort: {{ .Values.phpfpmService.phpfpmPort }}
+        - name: phpfpm-port
+          containerPort: {{ .Values.phpfpmService.phpfpmPort }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         readinessProbe:
@@ -33,6 +55,9 @@ spec:
         - name: phpconf-overrides
           mountPath: /opt/bitnami/php/etc/conf.d/php-ini-overrides.ini
           subPath: php-ini-overrides.ini
+        - name: php-fpm-z-overrides
+          mountPath: /opt/bitnami/php/etc/php-fpm.d/php-fpm-z-overrides.conf
+          subPath: z-overrides.conf
         - name: {{ .Values.volumes.php.persistentPublicVolumeNamePhp }}
           mountPath: {{ .Values.volumes.php.persistentPublicVolumeMountPathPhp }}
       volumes:
@@ -42,6 +67,12 @@ spec:
           items:
           - key: php-ini-overrides.ini
             path: php-ini-overrides.ini
+      - name: php-fpm-z-overrides
+        configMap:
+          name: {{ template "fullname" . }}-php-fpm-z-overrides
+          items:
+          - key: z-overrides.conf
+            path: z-overrides.conf
       - name: {{ .Values.volumes.php.persistentPublicVolumeNamePhp }}
         persistentVolumeClaim:
           claimName: {{ .Values.volumes.php.persistentPublicVolumeClaimPhp }}
@@ -69,6 +100,27 @@ spec:
       - name: {{ template "fullname" . }}-nginx
         image: "nginx:1.17.8-alpine"
         imagePullPolicy: {{ default "" .Values.image.pullPolicy | quote }}
+        env:
+          - name: "MYSQL_ROOT_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_root_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_USER"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_user
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_password
+                name: {{ .Release.Name }}-auth
+          - name: "MYSQL_DATABASE"
+            valueFrom:
+              secretKeyRef:
+                key:  mysql_database
+                name: {{ .Release.Name }}-auth
         ports:
         - name: http
           containerPort: {{ .Values.nginxService.internalPort }}

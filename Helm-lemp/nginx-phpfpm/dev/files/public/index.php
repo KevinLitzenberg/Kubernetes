@@ -1,11 +1,10 @@
-<html>
-
 <?php
 session_start();
 $_SESSION["id"] = session_id();
 $_SESSION["City"] = "None, Empty";
-
 ?>
+
+<html>
 
 <head>
 
@@ -1060,14 +1059,31 @@ a:active {}
 
 <title>www.facingsf.com:home</title><!-- index2005_added.html.php --><!--FSF_PhotoStack_url_varibles02.html.php -->
 <?php
-    function get_creds(){
-        $creds = parse_ini_file('../php_sql_config.ini');
-        return $creds;
-    }
+    function getcreds_mysql(){
+        # array of environment variables to retrieve from container.
+        $mysql_creds = array(
+            "MYSQL_ROOT_PASSWORD" => "", 
+            "MYSQL_PASSWORD" => "", 
+            "MYSQL_USER" => "", 
+            "MYSQL_DATABASE" => ""
+        );
+
+        # populate mysql_creds with environment variables.
+        foreach ($mysql_creds as $key => $value) {
+            $value = getenv($key);
+            #echo "$key:$value \n";
+            $mysql_creds[$key] = $value;
+        }
+        #print_array($mysql_creds);        
+        return $mysql_creds;
+    }  
+
 
    function get_sqli_connect($creds){
         if(!isset($connection)){
-            $connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
+            #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
+            $connection = mysqli_connect("nginx-phpfpm02-mysql", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
+
         }
         if($connection === false){
             return mysqli_connect_error();
@@ -1180,12 +1196,15 @@ a:active {}
            <div id="image_stack01">
                <a href=DisplayPhotoGallery01.html.php?City=SanFran&Year=2012>
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
                      //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
  
 		     //Connect and select db 
                      $link = get_sqli_connect($config);
-                     //$link = mysqli_connect('mysql', 'phpfpm', 'asdjI88387GHGsbyuXX9093j', 'wallfaces');
+                     //$link = mysqli_connect('mysql', 'phpfpm', 'some_password', 'wallfaces');
 
 		     //Run a queryi 
 		     $resultSF = mysqli_query($link, "SELECT * FROM faceimages WHERE `ImageLocation` = 'San Francisco, CA' AND YEAR(`ImageDate`)= '2012' AND `Notes` = 'splash' AND `Notes` != 'SIGNS and NOTES' ORDER BY `ImageDate` DESC LIMIT 3");			
@@ -1213,8 +1232,11 @@ a:active {}
 	   <div id="image_stack02">
 	       <a href=DisplayPhotoGallery01.html.php?City=SanFran&Year=2011>
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
                      //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1244,8 +1266,11 @@ a:active {}
           <div id="image_stack03">
 	      <a href=DisplayPhotoGallery01.html.php?City=SanFran&Year=2010>
 		 <?php
+		    // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
                     //Get credentials
-                    $config = get_creds();
+                    $config = getcreds_mysql();
 
                     //Connect and select db 
                     $link = get_sqli_connect($config);
@@ -1296,9 +1321,12 @@ a:active {}
 	   <div id="image_stack04">
 	       <a href=DisplayPhotoGallery01.html.php?City=LosAngeles&Year=2010>
                   <?php
-                     //Get credentials
-                     $config = get_creds();
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
 
+                     //Get credentials
+                     $config = getcreds_mysql();
+                     
                      //Connect and select db 
                      $link = get_sqli_connect($config);
 
@@ -1328,8 +1356,11 @@ a:active {}
            <div id="image_stack05">
                <a href=DisplayPhotoGallery01.html.php?City=NewYork&Year=2010>
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
 	             //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1359,8 +1390,11 @@ a:active {}
            <div id="image_stack06">
                <a href=DisplayPhotoGallery01.html.php?City=SoutheastAsia&Year=2008>
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
 	             //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1409,8 +1443,11 @@ a:active {}
 	   <div id="image_stack07">
 	       <a href=DisplayPhotoGallery01.html.php?City=CentralAmerica&Year=2010>	
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
                      //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1441,8 +1478,11 @@ a:active {}
 	   <div id="image_stack08">
 	       <a href=DisplayPhotoGallery01.html.php?City=BarcelonaSpain&Year=2006>
 	          <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
 		     //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1471,8 +1511,11 @@ a:active {}
            <div id="image_stack09">
 	       <a href=DisplayPhotoGallery01.html.php?City=ParisFrance&Year=2005-2006>
 		  <?php
+                     // Suppress mysql8.0 MY-013360
+                     error_reporting(E_ALL ^ E_DEPRECATED);
+
                      //Get credentials
-                     $config = get_creds();
+                     $config = getcreds_mysql();
 
                      //Connect and select db 
                      $link = get_sqli_connect($config);
@@ -1519,15 +1562,8 @@ a:active {}
 		    </div>
 		</div> <!--stack_caption_mid02 -->	
 	 	
-		
-		
-
-
-
-	 
     </div><!--page wrap-->
 </div><!--MainContent-->
-
 
 <body>
 
