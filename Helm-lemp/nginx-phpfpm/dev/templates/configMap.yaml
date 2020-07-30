@@ -12,8 +12,9 @@ data:
     server {
       listen 0.0.0.0:{{ .Values.nginxService.internalPort }};
       client_max_body_size 108M;
-      root /usr/share/nginx/html;
-      index index.html index.php;
+      #root /usr/share/nginx/html;
+      root /application;
+      index index.php index.html;
 
       if (!-e $request_filename) {
          rewrite ^.*$ /index.php last;
@@ -21,10 +22,12 @@ data:
 
       location ~ \.php$ {
         fastcgi_pass {{ template "fullname" . }}-phpfpm:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME /app$fastcgi_script_name;
-        fastcgi_buffers 16 16k;
-        fastcgi_buffer_size 32k;
+        #fastcgi_index index.php;
+        #fastcgi_param SCRIPT_FILENAME /application$fastcgi_script_name;
+        fastcgi_param REQUEST_METHOD $request_method;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        #fastcgi_buffers 16 16k;
+        #fastcgi_buffer_size 32k;
         include fastcgi_params;
 
       }
@@ -42,3 +45,18 @@ metadata:
 data:
   php-ini-overrides.ini: |-
 {{ .Files.Get "files/php-ini-overrides.ini" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-php-fpm-z-overrides
+  labels:
+    app: {{ template "fullname" . }}-php-fpm-z-overrides
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  z-overrides.conf: |-
+{{ .Files.Get "files/z-overrides.conf" | indent 4 }}
+
+

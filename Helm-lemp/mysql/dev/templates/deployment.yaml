@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "mysql.fullname" . }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   selector:
     matchLabels:
@@ -41,11 +45,20 @@ spec:
         - containerPort: {{ .Values.mysqlService.port }}
           name: mysql
         volumeMounts:
+        - name: mysql-overrides
+          mountPath: /etc/mysql/conf.d/mysql.cnf
+          subPath: mysql.cnf
         - mountPath: /docker-entrypoint-initdb.d
           name: {{ .Values.persistentVolumeInitdbName }}
         - mountPath: {{ .Values.persistentVolumeMountPath }}
           name: {{ .Values.persistentVolumeClaim }}  
       volumes:
+      - name: mysql-overrides
+        configMap:
+          name: {{ include "mysql.name" . }}-mysql-overrides
+          items:
+          - key: mysql.cnf
+            path: mysql.cnf
       - name: mysql-data-disk
         persistentVolumeClaim:
           claimName: {{ .Values.persistentVolumeClaim }}

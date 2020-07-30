@@ -13,14 +13,15 @@ nginxService:
   internalPort: 8080
 phpfpmService:
   name: phpfpm
-  type: NodePort
+  type: ClusterIP
   phpfpmPort: 9000
 
-persistentPublicVolume: public-volume
-persistentPublicVolumeClaim: public-claim 
-persistentPublicVolumeName: public-data-disc
+persistentPublicVolume: public-volume-nginx
+persistentPublicVolumeClaim: public-claim-nginx
+persistentPublicVolumeName: public-data-disc-nginx
 persistentPublicVolumeLocalStorage: "/hosthome/developer/Kubernetes/Helm-lemp/nginx-phpfpm/dev/files/public"
-persistentPublicVolumeMountPathNginx: "/usr/share/nginx/html"
+#persistentPublicVolumeMountPathNginx: "/usr/share/nginx/html"
+persistentPublicVolumeMountPathNginx: "/application"
 
 volumes:
   php:
@@ -28,7 +29,7 @@ volumes:
     persistentPublicVolumeClaimPhp: public-claim-php
     persistentPublicVolumeNamePhp: public-data-disc-php
     persistentPublicVolumeLocalStorage: "/hosthome/developer/Kubernetes/Helm-lemp/nginx-phpfpm/dev/files/public"
-    persistentPublicVolumeMountPathPhp: "/app"
+    persistentPublicVolumeMountPathPhp: "/application"
 
 
 ingress:
@@ -44,20 +45,6 @@ ingress:
     # - secretName: chart-example-tls
     #   hosts:
     #     - chart-example.local
-config:
-  nginx.conf: |-
-    server {
-      listen 0.0.0.0:8080;
-      root /app;
-      location / {
-        index index.html index.php;
-      }
-      location ~ \.php$ {
-        fastcgi_pass phpfpm-php-app-phpfpm:9000;
-        fastcgi_index index.php;
-        include fastcgi.conf;
-      }
-    }
 
 resources:
   limits:

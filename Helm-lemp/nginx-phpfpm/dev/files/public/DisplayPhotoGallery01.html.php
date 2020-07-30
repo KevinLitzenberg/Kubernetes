@@ -373,28 +373,50 @@ a:nth-child(n+7) .closed{
 
 <?php
 
-    function get_creds(){
-        $creds = parse_ini_file('../php_sql_config.ini');
-        return $creds;
+  function getcreds_mysql(){
+        # array of environment variables to retrieve from container.
+        $mysql_creds = array(
+            "MYSQL_ROOT_PASSWORD" => "",
+            "MYSQL_PASSWORD" => "",
+            "MYSQL_USER" => "",
+            "MYSQL_DATABASE" => ""
+        );
+
+        # populate mysql_creds with environment variables.
+        foreach ($mysql_creds as $key => $value) {
+            $value = getenv($key);
+            #echo "$key:$value \n";
+            $mysql_creds[$key] = $value;
+        }
+        #print_array($mysql_creds);        
+        return $mysql_creds;
     }
+
 
    function get_sqli_connect($creds){
         if(!isset($connection)){
-            $connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
+            #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
+            $connection = mysqli_connect("nginx-phpfpm02-mysql", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
+
         }
         if($connection === false){
             return mysqli_connect_error();
         }
         return $connection;
    }
-
-
-   $config = get_creds();
  
-   $link = get_sqli_connect($config);
+  // Suppress mysql8.0 MY-013360
+  error_reporting(E_ALL ^ E_DEPRECATED);
+
+  //Get credentials
+  $config = getcreds_mysql();
+
+  //Connect and select db 
+  $link = get_sqli_connect($config);
+
 	
    //Connect and select db
-   //$link = mysqli_connect("mysql", "phpfpm", "asdjI88387GHGsbyuXX9093", "wallfaces");
+   //$link = mysqli_connect("mysql", "phpfpm", "some_password", "wallfaces");
    //mysql_select_db("wallfaces");
 					
    $result = mysqli_query($link, "SELECT * FROM faceimages");
@@ -741,11 +763,15 @@ a:active {}
 	<div class="gallery">
 	
 	<?php
+           // Suppress mysql8.0 MY-013360
+           error_reporting(E_ALL ^ E_DEPRECATED);
+
            //Get credentials
-           $config = get_creds();
+           $config = getcreds_mysql();
 
            //Connect and select db 
            $link = get_sqli_connect($config);
+           //$link = mysqli_connect('mysql', 'phpfpm', 'some_password', 'wallfaces');
 
 	
 	   //Check for Paris then Run a query
