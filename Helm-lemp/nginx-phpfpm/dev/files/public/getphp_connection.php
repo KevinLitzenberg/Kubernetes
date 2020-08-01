@@ -40,7 +40,7 @@
     function get_sqli_connect($creds){
         if(!isset($connection)){
             #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
-            $connection = mysqli_connect("nginx-phpfpm02-mysql", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
+            $connection = mysqli_connect("mysql-facingsf", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
         }
         if($connection === false){
             echo "returning FALSE!\n\n\n";
