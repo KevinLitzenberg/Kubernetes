@@ -20,6 +20,10 @@ Dependencies:
 ```./mysql/developement/.sops.yaml``` 
    -place your public key id in this file. 
 
+## mysql service
+Set the name of the mysql service in the values.yaml file.  The name of the service must match the name used for the mysqli_connect scripts the nginx and phpfpm use. See example:
+``` $connection = mysqli_connect("mysql-facingsf", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']); ```
+
 
 ## mysql Development features
 Includes two persistenVolumes.
@@ -36,4 +40,8 @@ Includes two persistenVolumes.
 * ~~Create encyption keys for secrets.~~
 * Lockdown mysql version dev uses latest.
 * ~~Stop logging the following message.~~ "Please use caching_sha2_password instead'
-2020-07-01T18:00:09.691399Z 908 [Warning] [MY-013360] [Server] Plugin sha256_password reported: ''sha256_pas"
+2020-07-01T18:00:09.691399Z 908 [Warning] [MY-013360] [Server] Plugin sha256_password reported: ''sha256_pas"~~
+* ~~Suppressing the message with php
+ // Suppress mysql8.0 MY-013360
+ error_reporting(E_ALL ^ E_DEPRECATED);~~
+

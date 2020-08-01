@@ -63,24 +63,49 @@ C. [nginx] The following files are provided to test php.
 * Test from nginx container. 
 ``` curl http://localhost:8080/getcreds_mysql.php ``` 
 
-D. [php] ./Helm-lemp/nginx-phpfpm/dev/file/www.conf.example is the base config for phpfpm.  It is not used at all in the helm chart but is left here for referance.  Update any values from this file to z-overrides.conf to modify the behaviour of phpfpm.
+D. The value of mysqlService dnsName name of mysql MUST be used in the mysqli_connection parameter.
+
+file ../mysql/dev/values.yaml 
+``` mysqlService:
+  ...
+  dnsName: mysql-facingsf
+  ...
+  ...
+```
+
+``` $connection = mysqli_connect("mysql-facingsf ```
+
+PHPFPM:
+
+A. [php] ./Helm-lemp/nginx-phpfpm/dev/file/www.conf.example is the base config for phpfpm.  It is not used at all in the helm chart but is left here for referance.  Update any values from this file to z-overrides.conf to modify the behaviour of phpfpm.
 
 
 [ TO DO ]
 * [nginx & phpfpm] get base64enc working for templates/secrets.yaml
 
-* [nginx] index.php and DisplayPhotoGallery01.html.php are using the service name to query sql pod in mysqli_connect.  This service name need to be dynamic in the sense that it should write an env variable to phpfpm when the service is create.
+* ~~[nginx] index.php and DisplayPhotoGallery01.html.php are using the service name to query sql pod in mysqli_connect.  This service name need to be dynamic in the sense that it should write an env variable to phpfpm when the service is create.
 Example:
-```$connection = mysqli_connect("nginx-phpfpm02-mysql"```
+```$connection = mysqli_connect("nginx-phpfpm02-mysql"```~~
+
+* [nginx] The database service name is hard coded into the php files for the website.  Abstract the values into helm values. Then run a check in CI/CD that ensures they are the same.  Bump that value using environment var.
+```$connection = mysqli_connect("mysql-facingsf ```
 
 * [nginx] is using a secrets volume.  Pod should not need this since the request is now reading the env vars from the phpfpm pod.
 
-* [phpfpm] logging into mysql by updating to 'Please use caching_sha2_password instead'.
-Warning: [Warning] [MY-013360] [Server] Plugin sha256_password reported: ''sha256_password' is deprecated and will be removed in a future release. Please use caching_sha2_password instead'
 
-* Push logs from /opt/bitnami/php/logs to stdout using z-overrides configMap
 
-* Suppressing the message with php
+
+* ~~[phpfpm] logging into mysql by updating to 'Please use caching_sha2_password instead'.
+Warning: [Warning] [MY-013360] [Server] Plugin sha256_password reported: ''sha256_password' is deprecated and will be removed in a future release. Please use caching_sha2_password instead'~~
+
+* ~~[phpfpm]Suppressing the message with php
+ // Suppress mysql8.0 MY-013360
+ error_reporting(E_ALL ^ E_DEPRECATED);~~
+
+
+* ~~push logs from /opt/bitnami/php/logs to stdout using z-overrides configMap~~
+
+* ~~Suppressing the message with php
  // Suppress mysql8.0 MY-013360
  error_reporting(E_ALL ^ E_DEPRECATED);
 

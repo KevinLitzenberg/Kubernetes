@@ -393,16 +393,16 @@ a:nth-child(n+7) .closed{
     }
 
 
-   function get_sqli_connect($creds){
-        if(!isset($connection)){
-            #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
-            $connection = mysqli_connect("nginx-phpfpm02-mysql", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
+  function get_sqli_connect($creds){
+     if(!isset($connection)){
+     #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
+     $connection = mysqli_connect("mysql-facingsf", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
 
-        }
-        if($connection === false){
-            return mysqli_connect_error();
-        }
-        return $connection;
+     }
+     if($connection === false){
+         return mysqli_connect_error();
+     }
+     return $connection;
    }
  
   // Suppress mysql8.0 MY-013360

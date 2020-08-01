@@ -1082,7 +1082,7 @@ a:active {}
    function get_sqli_connect($creds){
         if(!isset($connection)){
             #$connection = mysqli_connect($creds['servername'], $creds['username'], $creds['password'], $creds['dbname']);
-            $connection = mysqli_connect("nginx-phpfpm02-mysql", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
+            $connection = mysqli_connect("mysql-facingsf", $creds['MYSQL_USER'], $creds['MYSQL_PASSWORD'], $creds['MYSQL_DATABASE']);
 
         }
         if($connection === false){
@@ -1090,6 +1090,10 @@ a:active {}
         }
         return $connection;
    }
+
+ // Suppress mysql8.0 MY-013360
+  error_reporting(E_ALL ^ E_DEPRECATED);
+
 ?>
 
 <body>
